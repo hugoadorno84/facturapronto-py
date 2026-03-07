@@ -49,6 +49,9 @@ serve(async (req) => {
     const { error: roleError } = await supabaseAdmin.from('user_roles').insert(roleData);
     if (roleError) throw roleError;
 
+    // Save email to profile
+    await supabaseAdmin.from('profiles').update({ email }).eq('user_id', userData.user.id);
+
     return new Response(JSON.stringify({ user: userData.user }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

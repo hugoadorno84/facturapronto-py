@@ -60,19 +60,19 @@ const UsuariosPage = () => {
       const empresaIds = [...new Set(roles.map(r => r.empresa_id).filter(Boolean))] as string[];
 
       const [profilesRes, consultorasRes, empresasRes] = await Promise.all([
-        supabase.from('profiles').select('user_id, full_name').in('user_id', userIds),
+        supabase.from('profiles').select('user_id, full_name, email').in('user_id', userIds),
         consultoraIds.length ? supabase.from('consultoras').select('id, nombre').in('id', consultoraIds) : { data: [] },
         empresaIds.length ? supabase.from('empresas').select('id, razon_social').in('id', empresaIds) : { data: [] },
       ]);
 
-      const profileMap = new Map(profilesRes.data?.map(p => [p.user_id, p.full_name]) || []);
+      const profileMap = new Map(profilesRes.data?.map(p => [p.user_id, { full_name: p.full_name, email: p.email }]) || []);
       const consultoraMap = new Map<string, string>(consultorasRes.data?.map(c => [c.id, c.nombre] as [string, string]) || []);
       const empresaMap = new Map<string, string>(empresasRes.data?.map(e => [e.id, e.razon_social] as [string, string]) || []);
 
       return roles.map(r => ({
         ...r,
-        full_name: profileMap.get(r.user_id) || r.user_id.slice(0, 8),
-        email: '',
+        full_name: profileMap.get(r.user_id)?.full_name || r.user_id.slice(0, 8),
+        email: profileMap.get(r.user_id)?.email || '',
         consultora_nombre: r.consultora_id ? consultoraMap.get(r.consultora_id) || null : null,
         empresa_nombre: r.empresa_id ? empresaMap.get(r.empresa_id) || null : null,
       })) as UserRow[];
@@ -194,6 +194,7 @@ const UsuariosPage = () => {
 
   const filtered = users?.filter(u =>
     u.full_name.toLowerCase().includes(search.toLowerCase()) ||
+    u.email.toLowerCase().includes(search.toLowerCase()) ||
     (u.consultora_nombre || '').toLowerCase().includes(search.toLowerCase())
   );
 
@@ -337,6 +338,7 @@ const UsuariosPage = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Rol</TableHead>
                 <TableHead>Consultora / Empresa</TableHead>
                 <TableHead>Fecha Creación</TableHead>
@@ -345,10 +347,10 @@ const UsuariosPage = () => {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
               ) : !filtered?.length ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={6} className="text-center py-8">
                     <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground">No hay usuarios registrados</p>
                   </TableCell>
@@ -357,6 +359,7 @@ const UsuariosPage = () => {
                 filtered.map(ur => (
                   <TableRow key={ur.id}>
                     <TableCell className="font-medium text-foreground">{ur.full_name}</TableCell>
+                    <TableCell className="text-muted-foreground">{ur.email || '—'}</TableCell>
                     <TableCell><Badge variant="secondary">{roleLabels[ur.role]}</Badge></TableCell>
                     <TableCell className="text-muted-foreground">
                       {ur.consultora_nombre || ur.empresa_nombre || '—'}
