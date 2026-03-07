@@ -334,9 +334,42 @@ const UsuariosPage = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+      <div className="flex flex-wrap gap-3 items-end">
+        <div className="relative max-w-sm flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+        </div>
+        <div className="min-w-[150px]">
+          <Select value={filterRole} onValueChange={setFilterRole}>
+            <SelectTrigger><SelectValue placeholder="Filtrar por rol" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los roles</SelectItem>
+              {availableRoles.map(r => <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        {userRole?.role === 'super_admin' && consultoras && consultoras.length > 0 && (
+          <div className="min-w-[180px]">
+            <Select value={filterConsultora} onValueChange={v => { setFilterConsultora(v); setFilterEmpresa('all'); }}>
+              <SelectTrigger><SelectValue placeholder="Filtrar por consultora" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las consultoras</SelectItem>
+                {consultoras.map(c => <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        {empresas && empresas.length > 0 && (
+          <div className="min-w-[180px]">
+            <Select value={filterEmpresa} onValueChange={setFilterEmpresa}>
+              <SelectTrigger><SelectValue placeholder="Filtrar por empresa" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las empresas</SelectItem>
+                {empresas.map(e => <SelectItem key={e.id} value={e.id}>{e.razon_social}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       <Card className="glass-panel">
