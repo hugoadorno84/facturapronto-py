@@ -337,6 +337,7 @@ const UsuariosPage = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Rol</TableHead>
                 <TableHead>Consultora / Empresa</TableHead>
                 <TableHead>Fecha Creación</TableHead>
