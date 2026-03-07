@@ -370,13 +370,13 @@ const UsuariosPage = () => {
             </Select>
           </div>
         )}
-        {empresas && empresas.length > 0 && (
+        {filteredEmpresas && filteredEmpresas.length > 0 && (
           <div className="min-w-[180px]">
             <Select value={filterEmpresa} onValueChange={setFilterEmpresa}>
               <SelectTrigger><SelectValue placeholder="Filtrar por empresa" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas las empresas</SelectItem>
-                {empresas.map(e => <SelectItem key={e.id} value={e.id}>{e.razon_social}</SelectItem>)}
+                {filteredEmpresas.map(e => <SelectItem key={e.id} value={e.id}>{e.razon_social}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
