@@ -19,6 +19,18 @@ serve(async (req) => {
 
     const { email, password, full_name, role, consultora_id, empresa_id } = await req.json();
 
+    if (!email || !password || !full_name || !role) {
+      throw new Error('Faltan campos requeridos');
+    }
+
+    if (role === 'empresa' && !empresa_id) {
+      throw new Error('Debe asignar una empresa al crear un usuario empresa');
+    }
+
+    if (role === 'consultora' && !consultora_id) {
+      throw new Error('Debe asignar una consultora al crear un usuario consultora');
+    }
+
     // Create user
     const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
       email,
