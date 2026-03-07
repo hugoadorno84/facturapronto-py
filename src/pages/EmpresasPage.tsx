@@ -18,6 +18,7 @@ const EmpresasPage = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [filterConsultora, setFilterConsultora] = useState<string>('all');
   const [form, setForm] = useState({
     razon_social: '', ruc: '', direccion: '', telefono: '', email: '',
     timbrado: '', numero_establecimiento: '001', punto_expedicion: '001', consultora_id: ''
@@ -57,9 +58,11 @@ const EmpresasPage = () => {
     onError: () => toast.error('Error al crear empresa'),
   });
 
-  const filtered = empresas?.filter(e =>
-    e.razon_social.toLowerCase().includes(search.toLowerCase()) || e.ruc.includes(search)
-  );
+  const filtered = empresas?.filter(e => {
+    const matchesSearch = e.razon_social.toLowerCase().includes(search.toLowerCase()) || e.ruc.includes(search);
+    const matchesConsultora = filterConsultora === 'all' || e.consultora_id === filterConsultora;
+    return matchesSearch && matchesConsultora;
+  });
 
   const statusColors: Record<string, string> = {
     activo: 'bg-success/10 text-success border-success/20',
@@ -140,9 +143,22 @@ const EmpresasPage = () => {
         </Dialog>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Buscar por nombre o RUC..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+      <div className="flex flex-wrap gap-3 items-end">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Buscar por nombre o RUC..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
+        </div>
+        {userRole?.role === 'super_admin' && consultoras && consultoras.length > 0 && (
+          <div className="min-w-[180px]">
+            <Select value={filterConsultora} onValueChange={setFilterConsultora}>
+              <SelectTrigger><SelectValue placeholder="Filtrar por consultora" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las consultoras</SelectItem>
+                {consultoras.map(c => <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       <Card className="glass-panel">
