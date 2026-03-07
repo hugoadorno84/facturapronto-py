@@ -43,6 +43,9 @@ const UsuariosPage = () => {
   const [passwordUser, setPasswordUser] = useState<UserRow | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [search, setSearch] = useState('');
+  const [filterRole, setFilterRole] = useState<string>('all');
+  const [filterConsultora, setFilterConsultora] = useState<string>('all');
+  const [filterEmpresa, setFilterEmpresa] = useState<string>('all');
   const [form, setForm] = useState({ email: '', password: '', full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
   const [editForm, setEditForm] = useState({ full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
 
