@@ -60,7 +60,7 @@ const UsuariosPage = () => {
       const empresaIds = [...new Set(roles.map(r => r.empresa_id).filter(Boolean))] as string[];
 
       const [profilesRes, consultorasRes, empresasRes] = await Promise.all([
-        supabase.from('profiles').select('user_id, full_name').in('user_id', userIds),
+        supabase.from('profiles').select('user_id, full_name, email').in('user_id', userIds),
         consultoraIds.length ? supabase.from('consultoras').select('id, nombre').in('id', consultoraIds) : { data: [] },
         empresaIds.length ? supabase.from('empresas').select('id, razon_social').in('id', empresaIds) : { data: [] },
       ]);
