@@ -303,6 +303,23 @@ const UsuariosPage = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Password Dialog */}
+      <Dialog open={!!passwordUser} onOpenChange={(o) => !o && setPasswordUser(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Cambiar Contraseña</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">Usuario: <span className="font-medium text-foreground">{passwordUser?.full_name}</span></p>
+          <form onSubmit={(e) => { e.preventDefault(); passwordMutation.mutate(); }} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nueva contraseña</Label>
+              <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} placeholder="Mínimo 6 caracteres" />
+            </div>
+            <Button type="submit" className="w-full" disabled={passwordMutation.isPending}>
+              {passwordMutation.isPending ? 'Actualizando...' : 'Actualizar Contraseña'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
