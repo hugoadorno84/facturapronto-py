@@ -195,11 +195,15 @@ const UsuariosPage = () => {
     ? ['super_admin', 'consultora', 'empresa']
     : ['empresa'];
 
-  const filtered = users?.filter(u =>
-    u.full_name.toLowerCase().includes(search.toLowerCase()) ||
-    u.email.toLowerCase().includes(search.toLowerCase()) ||
-    (u.consultora_nombre || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = users?.filter(u => {
+    const matchesSearch = u.full_name.toLowerCase().includes(search.toLowerCase()) ||
+      u.email.toLowerCase().includes(search.toLowerCase()) ||
+      (u.consultora_nombre || '').toLowerCase().includes(search.toLowerCase());
+    const matchesRole = filterRole === 'all' || u.role === filterRole;
+    const matchesConsultora = filterConsultora === 'all' || u.consultora_id === filterConsultora;
+    const matchesEmpresa = filterEmpresa === 'all' || u.empresa_id === filterEmpresa;
+    return matchesSearch && matchesRole && matchesConsultora && matchesEmpresa;
+  });
 
   return (
     <div className="space-y-6">
