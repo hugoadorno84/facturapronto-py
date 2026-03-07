@@ -98,6 +98,12 @@ const UsuariosPage = () => {
 
   const createMutation = useMutation({
     mutationFn: async () => {
+      if (form.role === 'empresa' && !form.empresa_id) {
+        throw new Error('Debe seleccionar una empresa para el usuario');
+      }
+      if (form.role === 'consultora' && userRole?.role === 'super_admin' && !form.consultora_id) {
+        throw new Error('Debe seleccionar una consultora para el usuario');
+      }
       const body: any = {
         email: form.email,
         password: form.password,
