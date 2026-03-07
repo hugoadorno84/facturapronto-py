@@ -51,33 +51,23 @@ const UsuariosPage = () => {
 
   const createMutation = useMutation({
     mutationFn: async () => {
-      // Create user via admin API would need edge function
-      // For now, create via signUp
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const body: any = {
         email: form.email,
         password: form.password,
-        options: { data: { full_name: form.full_name } },
-      });
-
-      if (authError || !authData.user) throw authError || new Error('No user');
-
-      const roleData: any = {
-        user_id: authData.user.id,
+        full_name: form.full_name,
         role: form.role,
       };
 
       if (form.role === 'consultora') {
-        roleData.consultora_id = userRole?.consultora_id;
+        body.consultora_id = userRole?.consultora_id;
       }
       if (form.role === 'empresa') {
-        roleData.empresa_id = form.empresa_id;
-        // Also get consultora_id from empresa
-        const { data: emp } = await supabase.from('empresas').select('consultora_id').eq('id', form.empresa_id).single();
-        if (emp) roleData.consultora_id = emp.consultora_id;
+        body.empresa_id = form.empresa_id;
       }
 
-      const { error: roleError } = await supabase.from('user_roles').insert(roleData);
-      if (roleError) throw roleError;
+      const { data, error } = await supabase.functions.invoke('create-user', { body });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-roles'] });
