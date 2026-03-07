@@ -339,10 +339,15 @@ const UsuariosPage = () => {
                       {ur.consultora_nombre || ur.empresa_nombre || '—'}
                     </TableCell>
                     <TableCell>{new Date(ur.created_at).toLocaleDateString('es-PY')}</TableCell>
-                    <TableCell>
+                    <TableCell className="flex gap-1">
                       <Button variant="ghost" size="icon" onClick={() => openEdit(ur)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      {userRole?.role === 'super_admin' && (
+                        <Button variant="ghost" size="icon" onClick={() => { setPasswordUser(ur); setNewPassword(''); }}>
+                          <KeyRound className="h-4 w-4" />
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
