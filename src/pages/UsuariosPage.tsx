@@ -155,6 +155,23 @@ const UsuariosPage = () => {
     onError: (e) => toast.error(`Error: ${e.message}`),
   });
 
+  const passwordMutation = useMutation({
+    mutationFn: async () => {
+      if (!passwordUser) return;
+      const { data, error } = await supabase.functions.invoke('update-password', {
+        body: { user_id: passwordUser.user_id, password: newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+    },
+    onSuccess: () => {
+      setPasswordUser(null);
+      setNewPassword('');
+      toast.success('Contraseña actualizada');
+    },
+    onError: (e) => toast.error(`Error: ${e.message}`),
+  });
+
   const openEdit = (user: UserRow) => {
     setEditUser(user);
     setEditForm({
