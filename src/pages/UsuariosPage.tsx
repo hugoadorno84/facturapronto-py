@@ -34,7 +34,7 @@ const UsuariosPage = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_roles')
-        .select('*, profiles!user_roles_user_id_fkey(full_name)')
+        .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data;
