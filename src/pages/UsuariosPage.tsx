@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Users } from 'lucide-react';
+import { Plus, Search, Users, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -22,12 +22,27 @@ const roleLabels: Record<AppRole, string> = {
   empresa: 'Empresa',
 };
 
+interface UserRow {
+  id: string;
+  user_id: string;
+  role: AppRole;
+  consultora_id: string | null;
+  empresa_id: string | null;
+  created_at: string;
+  full_name: string;
+  email: string;
+  consultora_nombre: string | null;
+  empresa_nombre: string | null;
+}
+
 const UsuariosPage = () => {
   const { userRole } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [editUser, setEditUser] = useState<UserRow | null>(null);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ email: '', password: '', full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
+  const [editForm, setEditForm] = useState({ full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['user-roles-with-profiles'],
@@ -38,19 +53,27 @@ const UsuariosPage = () => {
         .order('created_at', { ascending: false });
       if (error) throw error;
 
-      // Fetch profiles for all user_ids
       const userIds = roles.map(r => r.user_id);
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', userIds);
+      const consultoraIds = [...new Set(roles.map(r => r.consultora_id).filter(Boolean))] as string[];
+      const empresaIds = [...new Set(roles.map(r => r.empresa_id).filter(Boolean))] as string[];
 
-      const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+      const [profilesRes, consultorasRes, empresasRes] = await Promise.all([
+        supabase.from('profiles').select('user_id, full_name').in('user_id', userIds),
+        consultoraIds.length ? supabase.from('consultoras').select('id, nombre').in('id', consultoraIds) : { data: [] },
+        empresaIds.length ? supabase.from('empresas').select('id, razon_social').in('id', empresaIds) : { data: [] },
+      ]);
+
+      const profileMap = new Map(profilesRes.data?.map(p => [p.user_id, p.full_name]) || []);
+      const consultoraMap = new Map(consultorasRes.data?.map(c => [c.id, c.nombre]) || []);
+      const empresaMap = new Map(empresasRes.data?.map(e => [e.id, e.razon_social]) || []);
 
       return roles.map(r => ({
         ...r,
         full_name: profileMap.get(r.user_id) || r.user_id.slice(0, 8),
-      }));
+        email: '',
+        consultora_nombre: r.consultora_id ? consultoraMap.get(r.consultora_id) || null : null,
+        empresa_nombre: r.empresa_id ? empresaMap.get(r.empresa_id) || null : null,
+      })) as UserRow[];
     },
   });
 
@@ -79,7 +102,6 @@ const UsuariosPage = () => {
         full_name: form.full_name,
         role: form.role,
       };
-
       if (form.role === 'consultora' && userRole?.role === 'super_admin') {
         body.consultora_id = form.consultora_id;
       } else if (form.role === 'consultora') {
@@ -88,7 +110,6 @@ const UsuariosPage = () => {
       if (form.role === 'empresa') {
         body.empresa_id = form.empresa_id;
       }
-
       const { data, error } = await supabase.functions.invoke('create-user', { body });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -102,12 +123,53 @@ const UsuariosPage = () => {
     onError: (e) => toast.error(`Error: ${e.message}`),
   });
 
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      if (!editUser) return;
+
+      // Update profile name
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ full_name: editForm.full_name })
+        .eq('user_id', editUser.user_id);
+      if (profileError) throw profileError;
+
+      // Update role assignment
+      const roleUpdate: any = { role: editForm.role };
+      roleUpdate.consultora_id = editForm.role === 'consultora' ? editForm.consultora_id || null : null;
+      roleUpdate.empresa_id = editForm.role === 'empresa' ? editForm.empresa_id || null : null;
+
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .update(roleUpdate)
+        .eq('id', editUser.id);
+      if (roleError) throw roleError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-roles-with-profiles'] });
+      setEditUser(null);
+      toast.success('Usuario actualizado');
+    },
+    onError: (e) => toast.error(`Error: ${e.message}`),
+  });
+
+  const openEdit = (user: UserRow) => {
+    setEditUser(user);
+    setEditForm({
+      full_name: user.full_name,
+      role: user.role,
+      consultora_id: user.consultora_id || '',
+      empresa_id: user.empresa_id || '',
+    });
+  };
+
   const availableRoles: AppRole[] = userRole?.role === 'super_admin'
     ? ['super_admin', 'consultora', 'empresa']
     : ['empresa'];
 
   const filtered = users?.filter(u =>
-    u.full_name.toLowerCase().includes(search.toLowerCase())
+    u.full_name.toLowerCase().includes(search.toLowerCase()) ||
+    (u.consultora_nombre || '').toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -175,6 +237,53 @@ const UsuariosPage = () => {
         </Dialog>
       </div>
 
+      {/* Edit Dialog */}
+      <Dialog open={!!editUser} onOpenChange={(o) => !o && setEditUser(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Editar Usuario</DialogTitle></DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); updateMutation.mutate(); }} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nombre completo</Label>
+              <Input value={editForm.full_name} onChange={e => setEditForm({ ...editForm, full_name: e.target.value })} required />
+            </div>
+            <div className="space-y-2">
+              <Label>Rol</Label>
+              <Select value={editForm.role} onValueChange={v => setEditForm({ ...editForm, role: v, consultora_id: '', empresa_id: '' })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {availableRoles.map(r => <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            {editForm.role === 'consultora' && userRole?.role === 'super_admin' && (
+              <div className="space-y-2">
+                <Label>Consultora</Label>
+                <Select value={editForm.consultora_id} onValueChange={v => setEditForm({ ...editForm, consultora_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Seleccionar consultora" /></SelectTrigger>
+                  <SelectContent>
+                    {consultoras?.map(c => <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {editForm.role === 'empresa' && (
+              <div className="space-y-2">
+                <Label>Empresa</Label>
+                <Select value={editForm.empresa_id} onValueChange={v => setEditForm({ ...editForm, empresa_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Seleccionar empresa" /></SelectTrigger>
+                  <SelectContent>
+                    {empresas?.map(e => <SelectItem key={e.id} value={e.id}>{e.razon_social}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <Button type="submit" className="w-full" disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
@@ -187,15 +296,17 @@ const UsuariosPage = () => {
               <TableRow>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Rol</TableHead>
+                <TableHead>Consultora / Empresa</TableHead>
                 <TableHead>Fecha Creación</TableHead>
+                <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow><TableCell colSpan={3} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
               ) : !filtered?.length ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center py-8">
+                  <TableCell colSpan={5} className="text-center py-8">
                     <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground">No hay usuarios registrados</p>
                   </TableCell>
@@ -205,7 +316,15 @@ const UsuariosPage = () => {
                   <TableRow key={ur.id}>
                     <TableCell className="font-medium text-foreground">{ur.full_name}</TableCell>
                     <TableCell><Badge variant="secondary">{roleLabels[ur.role]}</Badge></TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {ur.consultora_nombre || ur.empresa_nombre || '—'}
+                    </TableCell>
                     <TableCell>{new Date(ur.created_at).toLocaleDateString('es-PY')}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" onClick={() => openEdit(ur)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))
               )}
