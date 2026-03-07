@@ -58,9 +58,11 @@ const EmpresasPage = () => {
     onError: () => toast.error('Error al crear empresa'),
   });
 
-  const filtered = empresas?.filter(e =>
-    e.razon_social.toLowerCase().includes(search.toLowerCase()) || e.ruc.includes(search)
-  );
+  const filtered = empresas?.filter(e => {
+    const matchesSearch = e.razon_social.toLowerCase().includes(search.toLowerCase()) || e.ruc.includes(search);
+    const matchesConsultora = filterConsultora === 'all' || e.consultora_id === filterConsultora;
+    return matchesSearch && matchesConsultora;
+  });
 
   const statusColors: Record<string, string> = {
     activo: 'bg-success/10 text-success border-success/20',
