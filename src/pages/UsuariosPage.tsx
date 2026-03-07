@@ -71,8 +71,8 @@ const UsuariosPage = () => {
 
       return roles.map(r => ({
         ...r,
-        full_name: profileMap.get(r.user_id) || r.user_id.slice(0, 8),
-        email: '',
+        full_name: profileMap.get(r.user_id)?.full_name || r.user_id.slice(0, 8),
+        email: profileMap.get(r.user_id)?.email || '',
         consultora_nombre: r.consultora_id ? consultoraMap.get(r.consultora_id) || null : null,
         empresa_nombre: r.empresa_id ? empresaMap.get(r.empresa_id) || null : null,
       })) as UserRow[];
