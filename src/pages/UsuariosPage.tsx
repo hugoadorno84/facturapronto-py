@@ -40,6 +40,8 @@ const UsuariosPage = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editUser, setEditUser] = useState<UserRow | null>(null);
+  const [passwordUser, setPasswordUser] = useState<UserRow | null>(null);
+  const [newPassword, setNewPassword] = useState('');
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ email: '', password: '', full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
   const [editForm, setEditForm] = useState({ full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
