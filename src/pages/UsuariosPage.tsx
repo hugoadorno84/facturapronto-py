@@ -94,7 +94,7 @@ const UsuariosPage = () => {
   const { data: empresas } = useQuery({
     queryKey: ['empresas-select'],
     queryFn: async () => {
-      const { data } = await supabase.from('empresas').select('id, razon_social');
+      const { data } = await supabase.from('empresas').select('id, razon_social, consultora_id');
       return data || [];
     },
   });
