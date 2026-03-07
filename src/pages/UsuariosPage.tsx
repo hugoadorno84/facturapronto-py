@@ -195,12 +195,23 @@ const UsuariosPage = () => {
     ? ['super_admin', 'consultora', 'empresa']
     : ['empresa'];
 
+  // Build a map of empresa_id -> consultora_id for cross-filtering
+  const empresaConsultoraMap = new Map(empresas?.map(e => [e.id, e.consultora_id]) || []);
+
+  // Filter empresas dropdown based on selected consultora
+  const filteredEmpresas = filterConsultora === 'all'
+    ? empresas
+    : empresas?.filter(e => e.consultora_id === filterConsultora);
+
   const filtered = users?.filter(u => {
     const matchesSearch = u.full_name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase()) ||
       (u.consultora_nombre || '').toLowerCase().includes(search.toLowerCase());
     const matchesRole = filterRole === 'all' || u.role === filterRole;
-    const matchesConsultora = filterConsultora === 'all' || u.consultora_id === filterConsultora;
+    // When filtering by consultora, also show empresa users whose empresa belongs to that consultora
+    const matchesConsultora = filterConsultora === 'all' ||
+      u.consultora_id === filterConsultora ||
+      (u.empresa_id && empresaConsultoraMap.get(u.empresa_id) === filterConsultora);
     const matchesEmpresa = filterEmpresa === 'all' || u.empresa_id === filterEmpresa;
     return matchesSearch && matchesRole && matchesConsultora && matchesEmpresa;
   });
