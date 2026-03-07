@@ -358,6 +358,7 @@ const UsuariosPage = () => {
                 filtered.map(ur => (
                   <TableRow key={ur.id}>
                     <TableCell className="font-medium text-foreground">{ur.full_name}</TableCell>
+                    <TableCell className="text-muted-foreground">{ur.email || '—'}</TableCell>
                     <TableCell><Badge variant="secondary">{roleLabels[ur.role]}</Badge></TableCell>
                     <TableCell className="text-muted-foreground">
                       {ur.consultora_nombre || ur.empresa_nombre || '—'}
