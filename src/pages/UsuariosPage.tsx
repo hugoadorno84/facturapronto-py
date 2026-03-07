@@ -346,7 +346,7 @@ const UsuariosPage = () => {
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
               ) : !filtered?.length ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8">
