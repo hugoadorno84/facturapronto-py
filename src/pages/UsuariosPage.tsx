@@ -65,7 +65,7 @@ const UsuariosPage = () => {
         empresaIds.length ? supabase.from('empresas').select('id, razon_social').in('id', empresaIds) : { data: [] },
       ]);
 
-      const profileMap = new Map(profilesRes.data?.map(p => [p.user_id, p.full_name]) || []);
+      const profileMap = new Map(profilesRes.data?.map(p => [p.user_id, { full_name: p.full_name, email: p.email }]) || []);
       const consultoraMap = new Map<string, string>(consultorasRes.data?.map(c => [c.id, c.nombre] as [string, string]) || []);
       const empresaMap = new Map<string, string>(empresasRes.data?.map(e => [e.id, e.razon_social] as [string, string]) || []);
 
