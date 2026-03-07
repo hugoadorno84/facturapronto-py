@@ -27,18 +27,40 @@ const UsuariosPage = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [form, setForm] = useState({ email: '', password: '', full_name: '', role: '' as string, empresa_id: '' });
+  const [form, setForm] = useState({ email: '', password: '', full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
 
-  const { data: userRoles, isLoading } = useQuery({
-    queryKey: ['user-roles'],
+  const { data: users, isLoading } = useQuery({
+    queryKey: ['user-roles-with-profiles'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: roles, error } = await supabase
         .from('user_roles')
         .select('*')
         .order('created_at', { ascending: false });
       if (error) throw error;
-      return data;
+
+      // Fetch profiles for all user_ids
+      const userIds = roles.map(r => r.user_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, full_name')
+        .in('user_id', userIds);
+
+      const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+
+      return roles.map(r => ({
+        ...r,
+        full_name: profileMap.get(r.user_id) || r.user_id.slice(0, 8),
+      }));
     },
+  });
+
+  const { data: consultoras } = useQuery({
+    queryKey: ['consultoras-select'],
+    queryFn: async () => {
+      const { data } = await supabase.from('consultoras').select('id, nombre');
+      return data || [];
+    },
+    enabled: userRole?.role === 'super_admin',
   });
 
   const { data: empresas } = useQuery({
@@ -58,7 +80,9 @@ const UsuariosPage = () => {
         role: form.role,
       };
 
-      if (form.role === 'consultora') {
+      if (form.role === 'consultora' && userRole?.role === 'super_admin') {
+        body.consultora_id = form.consultora_id;
+      } else if (form.role === 'consultora') {
         body.consultora_id = userRole?.consultora_id;
       }
       if (form.role === 'empresa') {
@@ -70,9 +94,9 @@ const UsuariosPage = () => {
       if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-roles'] });
+      queryClient.invalidateQueries({ queryKey: ['user-roles-with-profiles'] });
       setOpen(false);
-      setForm({ email: '', password: '', full_name: '', role: '', empresa_id: '' });
+      setForm({ email: '', password: '', full_name: '', role: '', consultora_id: '', empresa_id: '' });
       toast.success('Usuario creado exitosamente');
     },
     onError: (e) => toast.error(`Error: ${e.message}`),
@@ -81,6 +105,10 @@ const UsuariosPage = () => {
   const availableRoles: AppRole[] = userRole?.role === 'super_admin'
     ? ['super_admin', 'consultora', 'empresa']
     : ['empresa'];
+
+  const filtered = users?.filter(u =>
+    u.full_name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -110,13 +138,24 @@ const UsuariosPage = () => {
               </div>
               <div className="space-y-2">
                 <Label>Rol</Label>
-                <Select value={form.role} onValueChange={v => setForm({ ...form, role: v })}>
+                <Select value={form.role} onValueChange={v => setForm({ ...form, role: v, consultora_id: '', empresa_id: '' })}>
                   <SelectTrigger><SelectValue placeholder="Seleccionar rol" /></SelectTrigger>
                   <SelectContent>
                     {availableRoles.map(r => <SelectItem key={r} value={r}>{roleLabels[r]}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
+              {form.role === 'consultora' && userRole?.role === 'super_admin' && (
+                <div className="space-y-2">
+                  <Label>Consultora</Label>
+                  <Select value={form.consultora_id} onValueChange={v => setForm({ ...form, consultora_id: v })}>
+                    <SelectTrigger><SelectValue placeholder="Seleccionar consultora" /></SelectTrigger>
+                    <SelectContent>
+                      {consultoras?.map(c => <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               {form.role === 'empresa' && (
                 <div className="space-y-2">
                   <Label>Empresa</Label>
@@ -154,7 +193,7 @@ const UsuariosPage = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow><TableCell colSpan={3} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
-              ) : !userRoles?.length ? (
+              ) : !filtered?.length ? (
                 <TableRow>
                   <TableCell colSpan={3} className="text-center py-8">
                     <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
@@ -162,11 +201,9 @@ const UsuariosPage = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                userRoles?.map(ur => (
+                filtered.map(ur => (
                   <TableRow key={ur.id}>
-                    <TableCell className="font-medium text-foreground">
-                      {(ur as any).profiles?.full_name || ur.user_id.slice(0, 8)}
-                    </TableCell>
+                    <TableCell className="font-medium text-foreground">{ur.full_name}</TableCell>
                     <TableCell><Badge variant="secondary">{roleLabels[ur.role]}</Badge></TableCell>
                     <TableCell>{new Date(ur.created_at).toLocaleDateString('es-PY')}</TableCell>
                   </TableRow>
