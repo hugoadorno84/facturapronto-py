@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Users, Pencil } from 'lucide-react';
+import { Plus, Search, Users, Pencil, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -40,6 +40,8 @@ const UsuariosPage = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editUser, setEditUser] = useState<UserRow | null>(null);
+  const [passwordUser, setPasswordUser] = useState<UserRow | null>(null);
+  const [newPassword, setNewPassword] = useState('');
   const [search, setSearch] = useState('');
   const [form, setForm] = useState({ email: '', password: '', full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
   const [editForm, setEditForm] = useState({ full_name: '', role: '' as string, consultora_id: '', empresa_id: '' });
@@ -149,6 +151,23 @@ const UsuariosPage = () => {
       queryClient.invalidateQueries({ queryKey: ['user-roles-with-profiles'] });
       setEditUser(null);
       toast.success('Usuario actualizado');
+    },
+    onError: (e) => toast.error(`Error: ${e.message}`),
+  });
+
+  const passwordMutation = useMutation({
+    mutationFn: async () => {
+      if (!passwordUser) return;
+      const { data, error } = await supabase.functions.invoke('update-password', {
+        body: { user_id: passwordUser.user_id, password: newPassword },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+    },
+    onSuccess: () => {
+      setPasswordUser(null);
+      setNewPassword('');
+      toast.success('Contraseña actualizada');
     },
     onError: (e) => toast.error(`Error: ${e.message}`),
   });
@@ -284,6 +303,23 @@ const UsuariosPage = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Password Dialog */}
+      <Dialog open={!!passwordUser} onOpenChange={(o) => !o && setPasswordUser(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Cambiar Contraseña</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">Usuario: <span className="font-medium text-foreground">{passwordUser?.full_name}</span></p>
+          <form onSubmit={(e) => { e.preventDefault(); passwordMutation.mutate(); }} className="space-y-4">
+            <div className="space-y-2">
+              <Label>Nueva contraseña</Label>
+              <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6} placeholder="Mínimo 6 caracteres" />
+            </div>
+            <Button type="submit" className="w-full" disabled={passwordMutation.isPending}>
+              {passwordMutation.isPending ? 'Actualizando...' : 'Actualizar Contraseña'}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input placeholder="Buscar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
@@ -298,7 +334,7 @@ const UsuariosPage = () => {
                 <TableHead>Rol</TableHead>
                 <TableHead>Consultora / Empresa</TableHead>
                 <TableHead>Fecha Creación</TableHead>
-                <TableHead className="w-12"></TableHead>
+                <TableHead className="w-24"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -320,10 +356,15 @@ const UsuariosPage = () => {
                       {ur.consultora_nombre || ur.empresa_nombre || '—'}
                     </TableCell>
                     <TableCell>{new Date(ur.created_at).toLocaleDateString('es-PY')}</TableCell>
-                    <TableCell>
+                    <TableCell className="flex gap-1">
                       <Button variant="ghost" size="icon" onClick={() => openEdit(ur)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
+                      {userRole?.role === 'super_admin' && (
+                        <Button variant="ghost" size="icon" onClick={() => { setPasswordUser(ur); setNewPassword(''); }}>
+                          <KeyRound className="h-4 w-4" />
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
