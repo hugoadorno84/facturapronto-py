@@ -18,6 +18,7 @@ const EmpresasPage = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [filterConsultora, setFilterConsultora] = useState<string>('all');
   const [form, setForm] = useState({
     razon_social: '', ruc: '', direccion: '', telefono: '', email: '',
     timbrado: '', numero_establecimiento: '001', punto_expedicion: '001', consultora_id: ''
