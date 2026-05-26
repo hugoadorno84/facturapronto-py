@@ -348,6 +348,60 @@ export type Database = {
           },
         ]
       }
+      pagos: {
+        Row: {
+          cliente_id: string | null
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          factura_id: string | null
+          fecha: string
+          id: string
+          metodo: string | null
+          moneda: string
+          monto: number
+          observacion: string | null
+          proveedor_id: string | null
+          referencia: string | null
+          tipo: Database["public"]["Enums"]["pago_tipo"]
+          updated_at: string
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          factura_id?: string | null
+          fecha?: string
+          id?: string
+          metodo?: string | null
+          moneda?: string
+          monto?: number
+          observacion?: string | null
+          proveedor_id?: string | null
+          referencia?: string | null
+          tipo: Database["public"]["Enums"]["pago_tipo"]
+          updated_at?: string
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          factura_id?: string | null
+          fecha?: string
+          id?: string
+          metodo?: string | null
+          moneda?: string
+          monto?: number
+          observacion?: string | null
+          proveedor_id?: string | null
+          referencia?: string | null
+          tipo?: Database["public"]["Enums"]["pago_tipo"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       productos: {
         Row: {
           activo: boolean | null
@@ -425,6 +479,48 @@ export type Database = {
         }
         Relationships: []
       }
+      proveedores: {
+        Row: {
+          activo: boolean
+          created_at: string
+          direccion: string | null
+          email: string | null
+          empresa_id: string
+          id: string
+          nombre: string
+          plazo_pago_dias: number
+          ruc: string | null
+          telefono: string | null
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean
+          created_at?: string
+          direccion?: string | null
+          email?: string | null
+          empresa_id: string
+          id?: string
+          nombre: string
+          plazo_pago_dias?: number
+          ruc?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean
+          created_at?: string
+          direccion?: string | null
+          email?: string | null
+          empresa_id?: string
+          id?: string
+          nombre?: string
+          plazo_pago_dias?: number
+          ruc?: string | null
+          telefono?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           consultora_id: string | null
@@ -492,6 +588,7 @@ export type Database = {
         | "pagada"
         | "pago_parcial"
       iva_type: "10" | "5" | "exento"
+      pago_tipo: "cobro" | "pago"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -629,6 +726,7 @@ export const Constants = {
         "pago_parcial",
       ],
       iva_type: ["10", "5", "exento"],
+      pago_tipo: ["cobro", "pago"],
     },
   },
 } as const
