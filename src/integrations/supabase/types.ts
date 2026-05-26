@@ -225,6 +225,51 @@ export type Database = {
           },
         ]
       }
+      factura_series: {
+        Row: {
+          activo: boolean
+          codigo: string
+          created_at: string
+          descripcion: string | null
+          empresa_id: string
+          fecha_fin_timbrado: string | null
+          fecha_inicio_timbrado: string | null
+          id: string
+          numero_actual: number
+          predeterminada: boolean
+          timbrado: string | null
+          updated_at: string
+        }
+        Insert: {
+          activo?: boolean
+          codigo: string
+          created_at?: string
+          descripcion?: string | null
+          empresa_id: string
+          fecha_fin_timbrado?: string | null
+          fecha_inicio_timbrado?: string | null
+          id?: string
+          numero_actual?: number
+          predeterminada?: boolean
+          timbrado?: string | null
+          updated_at?: string
+        }
+        Update: {
+          activo?: boolean
+          codigo?: string
+          created_at?: string
+          descripcion?: string | null
+          empresa_id?: string
+          fecha_fin_timbrado?: string | null
+          fecha_inicio_timbrado?: string | null
+          id?: string
+          numero_actual?: number
+          predeterminada?: boolean
+          timbrado?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       facturas: {
         Row: {
           cliente_id: string
@@ -239,6 +284,7 @@ export type Database = {
           moneda: string
           numero: string
           observacion: string | null
+          serie_id: string | null
           subtotal: number
           timbrado: string | null
           total: number
@@ -258,6 +304,7 @@ export type Database = {
           moneda?: string
           numero: string
           observacion?: string | null
+          serie_id?: string | null
           subtotal?: number
           timbrado?: string | null
           total?: number
@@ -277,6 +324,7 @@ export type Database = {
           moneda?: string
           numero?: string
           observacion?: string | null
+          serie_id?: string | null
           subtotal?: number
           timbrado?: string | null
           total?: number
