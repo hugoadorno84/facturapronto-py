@@ -41,6 +41,7 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
   const [saving, setSaving] = useState(false);
 
   const [clienteId, setClienteId] = useState('');
+  const [serieId, setSerieId] = useState('');
   const [numero, setNumero] = useState('');
   const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10));
   const [condicion, setCondicion] = useState('contado');
@@ -58,6 +59,16 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
         .from('clientes').select('id, nombre, ruc, sucursal').eq('activo', true).order('nombre');
       return data || [];
     },
+  });
+
+  const { data: series = [] } = useQuery({
+    queryKey: ['factura_series_activas', userRole?.empresa_id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('factura_series' as any).select('*').eq('activo', true).order('codigo');
+      return (data as any[]) || [];
+    },
+    enabled: !!userRole?.empresa_id,
   });
 
   const { data: productos = [] } = useQuery({
