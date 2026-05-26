@@ -234,7 +234,9 @@ export type Database = {
           empresa_id: string
           estado: Database["public"]["Enums"]["invoice_status"]
           fecha: string
+          fx_rate: number
           id: string
+          moneda: string
           numero: string
           observacion: string | null
           subtotal: number
@@ -251,7 +253,9 @@ export type Database = {
           empresa_id: string
           estado?: Database["public"]["Enums"]["invoice_status"]
           fecha?: string
+          fx_rate?: number
           id?: string
+          moneda?: string
           numero: string
           observacion?: string | null
           subtotal?: number
@@ -268,7 +272,9 @@ export type Database = {
           empresa_id?: string
           estado?: Database["public"]["Enums"]["invoice_status"]
           fecha?: string
+          fx_rate?: number
           id?: string
+          moneda?: string
           numero?: string
           observacion?: string | null
           subtotal?: number
@@ -431,7 +437,12 @@ export type Database = {
     Enums: {
       app_role: "super_admin" | "consultora" | "empresa"
       entity_status: "activo" | "inactivo" | "suspendido"
-      invoice_status: "borrador" | "emitida" | "anulada" | "pagada"
+      invoice_status:
+        | "borrador"
+        | "emitida"
+        | "anulada"
+        | "pagada"
+        | "pago_parcial"
       iva_type: "10" | "5" | "exento"
     }
     CompositeTypes: {
@@ -562,7 +573,13 @@ export const Constants = {
     Enums: {
       app_role: ["super_admin", "consultora", "empresa"],
       entity_status: ["activo", "inactivo", "suspendido"],
-      invoice_status: ["borrador", "emitida", "anulada", "pagada"],
+      invoice_status: [
+        "borrador",
+        "emitida",
+        "anulada",
+        "pagada",
+        "pago_parcial",
+      ],
       iva_type: ["10", "5", "exento"],
     },
   },
