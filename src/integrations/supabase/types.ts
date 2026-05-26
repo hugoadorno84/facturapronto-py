@@ -16,37 +16,46 @@ export type Database = {
     Tables: {
       clientes: {
         Row: {
+          activo: boolean
           created_at: string
           direccion: string | null
           email: string | null
           empresa_id: string
           id: string
           nombre: string
+          plazo_pago_dias: number
           ruc: string
+          sucursal: string | null
           telefono: string | null
           tipo_documento: string | null
           updated_at: string
         }
         Insert: {
+          activo?: boolean
           created_at?: string
           direccion?: string | null
           email?: string | null
           empresa_id: string
           id?: string
           nombre: string
+          plazo_pago_dias?: number
           ruc: string
+          sucursal?: string | null
           telefono?: string | null
           tipo_documento?: string | null
           updated_at?: string
         }
         Update: {
+          activo?: boolean
           created_at?: string
           direccion?: string | null
           email?: string | null
           empresa_id?: string
           id?: string
           nombre?: string
+          plazo_pago_dias?: number
           ruc?: string
+          sucursal?: string | null
           telefono?: string | null
           tipo_documento?: string | null
           updated_at?: string
