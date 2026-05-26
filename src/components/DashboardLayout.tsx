@@ -47,9 +47,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     if (role === 'empresa') {
       items.push(
         { label: 'Clientes', href: '/clientes', icon: UserCheck },
+        { label: 'Proveedores', href: '/proveedores', icon: Truck },
         { label: 'Productos', href: '/productos', icon: Package },
         { label: 'Facturas', href: '/facturas', icon: FileText },
         { label: 'Series', href: '/series', icon: Hash },
+        { label: 'Cobros/Pagos', href: '/pagos', icon: Wallet },
+        { label: 'Reportes', href: '/reportes', icon: FileBarChart },
       );
     }
 
