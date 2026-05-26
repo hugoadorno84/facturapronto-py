@@ -177,18 +177,27 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
 
     setSaving(true);
     try {
+      const serieSel = series.find((s: any) => s.id === serieId);
       let nextNum = numero;
-      if (!factura && !nextNum) {
-        const { data: last } = await supabase
-          .from('facturas').select('numero').eq('empresa_id', empresa_id)
-          .order('created_at', { ascending: false }).limit(1).maybeSingle();
-        nextNum = last ? String(parseInt(last.numero) + 1).padStart(7, '0') : '0000001';
+      let nextSerieCount: number | null = null;
+      if (!factura) {
+        if (!serieSel) {
+          toast.error('Selecciona una serie de facturación');
+          setSaving(false);
+          return;
+        }
+        nextSerieCount = (Number(serieSel.numero_actual) || 0) + 1;
+        if (!nextNum) {
+          nextNum = `${serieSel.codigo}-${String(nextSerieCount).padStart(7, '0')}`;
+        }
       }
 
-      const payload = {
+      const payload: any = {
         empresa_id,
         cliente_id: clienteId,
+        serie_id: serieId || null,
         numero: nextNum,
+        timbrado: serieSel?.timbrado || null,
         fecha,
         condicion,
         moneda,
@@ -212,6 +221,11 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
           .select('id').single();
         if (error) throw error;
         facturaId = data.id;
+        if (serieSel && nextSerieCount !== null) {
+          await supabase.from('factura_series' as any)
+            .update({ numero_actual: nextSerieCount })
+            .eq('id', serieSel.id);
+        }
       }
 
       const itemsData = items.map((it) => ({
