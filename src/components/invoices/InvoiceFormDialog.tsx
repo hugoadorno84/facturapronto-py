@@ -83,6 +83,7 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
   useEffect(() => {
     if (factura && open) {
       setClienteId(factura.cliente_id);
+      setSerieId(factura.serie_id || '');
       setNumero(factura.numero || '');
       setFecha(factura.fecha);
       setCondicion(factura.condicion || 'contado');
@@ -102,6 +103,8 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
       });
     } else if (!factura && open) {
       setClienteId('');
+      const def = series.find((s: any) => s.predeterminada) || series[0];
+      setSerieId(def?.id || '');
       setNumero('');
       setFecha(new Date().toISOString().slice(0, 10));
       setCondicion('contado');
@@ -110,7 +113,16 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
       setObservacion('');
       setItems([{ descripcion: '', cantidad: 1, precio_unitario: 0, iva: '10' }]);
     }
-  }, [factura, open]);
+  }, [factura, open, series]);
+
+  // Auto-preview next number when serie changes (only for new invoices, if user didn't override)
+  useEffect(() => {
+    if (factura || !serieId) return;
+    const s = series.find((x: any) => x.id === serieId);
+    if (!s) return;
+    const next = (Number(s.numero_actual) || 0) + 1;
+    setNumero(`${s.codigo}-${String(next).padStart(7, '0')}`);
+  }, [serieId, series, factura]);
 
   const addItem = () => setItems([...items, { descripcion: '', cantidad: 1, precio_unitario: 0, iva: '10' }]);
   const removeItem = (i: number) => setItems(items.filter((_, idx) => idx !== i));
