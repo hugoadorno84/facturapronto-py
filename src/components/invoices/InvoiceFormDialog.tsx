@@ -262,6 +262,21 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
             <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
           </div>
           <div className="space-y-2">
+            <Label>Serie</Label>
+            <Select value={serieId} onValueChange={setSerieId} disabled={!!factura}>
+              <SelectTrigger>
+                <SelectValue placeholder={series.length ? 'Seleccionar' : 'Sin series — crea una en Series'} />
+              </SelectTrigger>
+              <SelectContent>
+                {series.map((s: any) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.codigo}{s.descripcion ? ` — ${s.descripcion}` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
             <Label>Nro. factura</Label>
             <Input value={numero} onChange={(e) => setNumero(e.target.value)} placeholder="Auto" />
           </div>
