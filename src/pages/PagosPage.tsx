@@ -82,6 +82,21 @@ const PagosPage = () => {
     enabled: !!empresaId,
   });
 
+  const { data: facturasCliente } = useQuery({
+    queryKey: ['pagos-facturas-cliente', empresaId, form.cliente_id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('facturas')
+        .select('id, numero, fecha, total, moneda, estado')
+        .eq('empresa_id', empresaId!)
+        .eq('cliente_id', form.cliente_id)
+        .in('estado', ['emitida', 'pago_parcial'])
+        .order('fecha', { ascending: false });
+      return data || [];
+    },
+    enabled: !!empresaId && form.tipo === 'cobro' && !!form.cliente_id,
+  });
+
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (!empresaId) throw new Error('Sin empresa');
