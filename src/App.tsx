@@ -50,6 +50,9 @@ const App = () => (
             <Route path="/productos" element={<DashboardRoute allowedRoles={['empresa']}><ProductosPage /></DashboardRoute>} />
             <Route path="/facturas" element={<DashboardRoute allowedRoles={['empresa']}><FacturasPage /></DashboardRoute>} />
             <Route path="/series" element={<DashboardRoute allowedRoles={['empresa']}><SeriesPage /></DashboardRoute>} />
+            <Route path="/proveedores" element={<DashboardRoute allowedRoles={['empresa']}><ProveedoresPage /></DashboardRoute>} />
+            <Route path="/pagos" element={<DashboardRoute allowedRoles={['empresa']}><PagosPage /></DashboardRoute>} />
+            <Route path="/reportes" element={<DashboardRoute allowedRoles={['empresa']}><ReportesPage /></DashboardRoute>} />
             <Route path="/facturacion" element={<DashboardRoute allowedRoles={['consultora']}><FacturacionConsultoraPage /></DashboardRoute>} />
             <Route path="/configuracion" element={<DashboardRoute><ConfiguracionPage /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
