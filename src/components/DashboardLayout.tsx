@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Building2, Users, FileText, Package, UserCheck, LayoutDashboard,
-  LogOut, Settings, ChevronLeft, ChevronRight, Receipt, BarChart3
+  LogOut, Settings, ChevronLeft, ChevronRight, Receipt, BarChart3, Hash
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -49,6 +49,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         { label: 'Clientes', href: '/clientes', icon: UserCheck },
         { label: 'Productos', href: '/productos', icon: Package },
         { label: 'Facturas', href: '/facturas', icon: FileText },
+        { label: 'Series', href: '/series', icon: Hash },
       );
     }
 

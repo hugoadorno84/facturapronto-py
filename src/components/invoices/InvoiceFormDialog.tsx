@@ -41,6 +41,7 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
   const [saving, setSaving] = useState(false);
 
   const [clienteId, setClienteId] = useState('');
+  const [serieId, setSerieId] = useState('');
   const [numero, setNumero] = useState('');
   const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10));
   const [condicion, setCondicion] = useState('contado');
@@ -60,6 +61,16 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
     },
   });
 
+  const { data: series = [] } = useQuery({
+    queryKey: ['factura_series_activas', userRole?.empresa_id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('factura_series' as any).select('*').eq('activo', true).order('codigo');
+      return (data as any[]) || [];
+    },
+    enabled: !!userRole?.empresa_id,
+  });
+
   const { data: productos = [] } = useQuery({
     queryKey: ['productos-activos'],
     queryFn: async () => {
@@ -72,6 +83,7 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
   useEffect(() => {
     if (factura && open) {
       setClienteId(factura.cliente_id);
+      setSerieId(factura.serie_id || '');
       setNumero(factura.numero || '');
       setFecha(factura.fecha);
       setCondicion(factura.condicion || 'contado');
@@ -91,6 +103,8 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
       });
     } else if (!factura && open) {
       setClienteId('');
+      const def = series.find((s: any) => s.predeterminada) || series[0];
+      setSerieId(def?.id || '');
       setNumero('');
       setFecha(new Date().toISOString().slice(0, 10));
       setCondicion('contado');
@@ -99,7 +113,16 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
       setObservacion('');
       setItems([{ descripcion: '', cantidad: 1, precio_unitario: 0, iva: '10' }]);
     }
-  }, [factura, open]);
+  }, [factura, open, series]);
+
+  // Auto-preview next number when serie changes (only for new invoices, if user didn't override)
+  useEffect(() => {
+    if (factura || !serieId) return;
+    const s = series.find((x: any) => x.id === serieId);
+    if (!s) return;
+    const next = (Number(s.numero_actual) || 0) + 1;
+    setNumero(`${s.codigo}-${String(next).padStart(7, '0')}`);
+  }, [serieId, series, factura]);
 
   const addItem = () => setItems([...items, { descripcion: '', cantidad: 1, precio_unitario: 0, iva: '10' }]);
   const removeItem = (i: number) => setItems(items.filter((_, idx) => idx !== i));
@@ -154,18 +177,27 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
 
     setSaving(true);
     try {
+      const serieSel = series.find((s: any) => s.id === serieId);
       let nextNum = numero;
-      if (!factura && !nextNum) {
-        const { data: last } = await supabase
-          .from('facturas').select('numero').eq('empresa_id', empresa_id)
-          .order('created_at', { ascending: false }).limit(1).maybeSingle();
-        nextNum = last ? String(parseInt(last.numero) + 1).padStart(7, '0') : '0000001';
+      let nextSerieCount: number | null = null;
+      if (!factura) {
+        if (!serieSel) {
+          toast.error('Selecciona una serie de facturación');
+          setSaving(false);
+          return;
+        }
+        nextSerieCount = (Number(serieSel.numero_actual) || 0) + 1;
+        if (!nextNum) {
+          nextNum = `${serieSel.codigo}-${String(nextSerieCount).padStart(7, '0')}`;
+        }
       }
 
-      const payload = {
+      const payload: any = {
         empresa_id,
         cliente_id: clienteId,
+        serie_id: serieId || null,
         numero: nextNum,
+        timbrado: serieSel?.timbrado || null,
         fecha,
         condicion,
         moneda,
@@ -189,6 +221,11 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
           .select('id').single();
         if (error) throw error;
         facturaId = data.id;
+        if (serieSel && nextSerieCount !== null) {
+          await supabase.from('factura_series' as any)
+            .update({ numero_actual: nextSerieCount })
+            .eq('id', serieSel.id);
+        }
       }
 
       const itemsData = items.map((it) => ({
@@ -237,6 +274,21 @@ export function InvoiceFormDialog({ open, onOpenChange, factura }: Props) {
           <div className="space-y-2">
             <Label>Fecha emisión</Label>
             <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Serie</Label>
+            <Select value={serieId} onValueChange={setSerieId} disabled={!!factura}>
+              <SelectTrigger>
+                <SelectValue placeholder={series.length ? 'Seleccionar' : 'Sin series — crea una en Series'} />
+              </SelectTrigger>
+              <SelectContent>
+                {series.map((s: any) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.codigo}{s.descripcion ? ` — ${s.descripcion}` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label>Nro. factura</Label>

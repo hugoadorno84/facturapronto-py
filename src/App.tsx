@@ -13,6 +13,7 @@ import EmpresasPage from "@/pages/EmpresasPage";
 import ClientesPage from "@/pages/ClientesPage";
 import ProductosPage from "@/pages/ProductosPage";
 import FacturasPage from "@/pages/FacturasPage";
+import SeriesPage from "@/pages/SeriesPage";
 import UsuariosPage from "@/pages/UsuariosPage";
 import MetricasPage from "@/pages/MetricasPage";
 import ConfiguracionPage from "@/pages/ConfiguracionPage";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/clientes" element={<DashboardRoute allowedRoles={['empresa']}><ClientesPage /></DashboardRoute>} />
             <Route path="/productos" element={<DashboardRoute allowedRoles={['empresa']}><ProductosPage /></DashboardRoute>} />
             <Route path="/facturas" element={<DashboardRoute allowedRoles={['empresa']}><FacturasPage /></DashboardRoute>} />
+            <Route path="/series" element={<DashboardRoute allowedRoles={['empresa']}><SeriesPage /></DashboardRoute>} />
             <Route path="/facturacion" element={<DashboardRoute allowedRoles={['consultora']}><FacturacionConsultoraPage /></DashboardRoute>} />
             <Route path="/configuracion" element={<DashboardRoute><ConfiguracionPage /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
