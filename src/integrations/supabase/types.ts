@@ -577,6 +577,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      update_factura_estado_from_pagos: {
+        Args: { _factura_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "super_admin" | "consultora" | "empresa"
