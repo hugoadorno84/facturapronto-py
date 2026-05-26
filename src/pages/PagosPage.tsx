@@ -118,6 +118,8 @@ const PagosPage = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] });
+      queryClient.invalidateQueries({ queryKey: ['facturas'] });
+      queryClient.invalidateQueries({ queryKey: ['pagos-facturas-cliente'] });
       setOpen(false);
       toast.success('Registro creado');
     },
