@@ -82,6 +82,21 @@ const PagosPage = () => {
     enabled: !!empresaId,
   });
 
+  const { data: facturasCliente } = useQuery({
+    queryKey: ['pagos-facturas-cliente', empresaId, form.cliente_id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('facturas')
+        .select('id, numero, fecha, total, moneda, estado')
+        .eq('empresa_id', empresaId!)
+        .eq('cliente_id', form.cliente_id)
+        .in('estado', ['emitida', 'pago_parcial'])
+        .order('fecha', { ascending: false });
+      return data || [];
+    },
+    enabled: !!empresaId && form.tipo === 'cobro' && !!form.cliente_id,
+  });
+
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (!empresaId) throw new Error('Sin empresa');
@@ -149,15 +164,36 @@ const PagosPage = () => {
               </div>
 
               {form.tipo === 'cobro' ? (
-                <div className="space-y-2">
-                  <Label>Cliente</Label>
-                  <Select value={form.cliente_id} onValueChange={(v) => setForm({ ...form, cliente_id: v })}>
-                    <SelectTrigger><SelectValue placeholder="Seleccionar cliente" /></SelectTrigger>
-                    <SelectContent>
-                      {clientes?.map(c => <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <Label>Cliente</Label>
+                    <Select value={form.cliente_id} onValueChange={(v) => setForm({ ...form, cliente_id: v, factura_id: '' })}>
+                      <SelectTrigger><SelectValue placeholder="Seleccionar cliente" /></SelectTrigger>
+                      <SelectContent>
+                        {clientes?.map(c => <SelectItem key={c.id} value={c.id}>{c.nombre}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {form.cliente_id && (
+                    <div className="space-y-2">
+                      <Label>Factura (opcional)</Label>
+                      <Select value={form.factura_id || 'none'} onValueChange={(v) => setForm({ ...form, factura_id: v === 'none' ? '' : v })}>
+                        <SelectTrigger><SelectValue placeholder="Sin factura asociada" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Sin factura asociada</SelectItem>
+                          {facturasCliente?.length === 0 && (
+                            <div className="px-2 py-1.5 text-sm text-muted-foreground">No hay facturas pendientes</div>
+                          )}
+                          {facturasCliente?.map((f: any) => (
+                            <SelectItem key={f.id} value={f.id}>
+                              {f.numero} — {f.fecha} — {formatNum(f.total, f.moneda)} {f.moneda}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="space-y-2">
                   <Label>Proveedor</Label>
