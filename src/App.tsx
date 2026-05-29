@@ -21,6 +21,11 @@ import UsuariosPage from "@/pages/UsuariosPage";
 import MetricasPage from "@/pages/MetricasPage";
 import ConfiguracionPage from "@/pages/ConfiguracionPage";
 import FacturacionConsultoraPage from "@/pages/FacturacionConsultoraPage";
+import PresupuestosPage from "@/pages/PresupuestosPage";
+import ProyectosPage from "@/pages/ProyectosPage";
+import ServiciosPage from "@/pages/ServiciosPage";
+import CalendarioPage from "@/pages/CalendarioPage";
+import TipoCambioPage from "@/pages/TipoCambioPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +57,11 @@ const App = () => (
             <Route path="/series" element={<DashboardRoute allowedRoles={['empresa']}><SeriesPage /></DashboardRoute>} />
             <Route path="/proveedores" element={<DashboardRoute allowedRoles={['empresa']}><ProveedoresPage /></DashboardRoute>} />
             <Route path="/pagos" element={<DashboardRoute allowedRoles={['empresa']}><PagosPage /></DashboardRoute>} />
+            <Route path="/presupuestos" element={<DashboardRoute allowedRoles={['empresa']}><PresupuestosPage /></DashboardRoute>} />
+            <Route path="/proyectos" element={<DashboardRoute allowedRoles={['empresa']}><ProyectosPage /></DashboardRoute>} />
+            <Route path="/servicios" element={<DashboardRoute allowedRoles={['empresa']}><ServiciosPage /></DashboardRoute>} />
+            <Route path="/calendario" element={<DashboardRoute allowedRoles={['empresa']}><CalendarioPage /></DashboardRoute>} />
+            <Route path="/tipo-cambio" element={<DashboardRoute allowedRoles={['empresa']}><TipoCambioPage /></DashboardRoute>} />
             <Route path="/reportes" element={<DashboardRoute allowedRoles={['empresa']}><ReportesPage /></DashboardRoute>} />
             <Route path="/facturacion" element={<DashboardRoute allowedRoles={['consultora']}><FacturacionConsultoraPage /></DashboardRoute>} />
             <Route path="/configuracion" element={<DashboardRoute><ConfiguracionPage /></DashboardRoute>} />
