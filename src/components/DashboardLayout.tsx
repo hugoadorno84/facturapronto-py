@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Building2, Users, FileText, Package, UserCheck, LayoutDashboard,
   LogOut, Settings, ChevronLeft, ChevronRight, Receipt, BarChart3, Truck,
-  CreditCard, FolderKanban, Wrench, CalendarDays, ArrowLeftRight, FileBarChart, ReceiptText,
+  CreditCard, FolderKanban, Wrench, CalendarDays, ArrowLeftRight, FileBarChart, ReceiptText, FileMinus,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
