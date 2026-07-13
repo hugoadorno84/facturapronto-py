@@ -27,6 +27,7 @@ import ProyectosPage from "@/pages/ProyectosPage";
 import ServiciosPage from "@/pages/ServiciosPage";
 import CalendarioPage from "@/pages/CalendarioPage";
 import TipoCambioPage from "@/pages/TipoCambioPage";
+import NotasCreditoPage from "@/pages/NotasCreditoPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
