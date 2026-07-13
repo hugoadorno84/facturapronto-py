@@ -462,6 +462,129 @@ export type Database = {
         }
         Relationships: []
       }
+      nota_credito_items: {
+        Row: {
+          cantidad: number
+          created_at: string
+          descripcion: string
+          id: string
+          iva_tipo: string
+          nota_credito_id: string
+          precio_unitario: number
+          subtotal: number
+        }
+        Insert: {
+          cantidad?: number
+          created_at?: string
+          descripcion: string
+          id?: string
+          iva_tipo?: string
+          nota_credito_id: string
+          precio_unitario?: number
+          subtotal?: number
+        }
+        Update: {
+          cantidad?: number
+          created_at?: string
+          descripcion?: string
+          id?: string
+          iva_tipo?: string
+          nota_credito_id?: string
+          precio_unitario?: number
+          subtotal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nota_credito_items_nota_credito_id_fkey"
+            columns: ["nota_credito_id"]
+            isOneToOne: false
+            referencedRelation: "notas_credito"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notas_credito: {
+        Row: {
+          cliente_id: string
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          estado: string
+          factura_id: string | null
+          fecha: string
+          id: string
+          iva_10: number
+          iva_5: number
+          moneda: string
+          motivo: string
+          numero: string
+          observacion: string | null
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          estado?: string
+          factura_id?: string | null
+          fecha?: string
+          id?: string
+          iva_10?: number
+          iva_5?: number
+          moneda?: string
+          motivo?: string
+          numero: string
+          observacion?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          estado?: string
+          factura_id?: string | null
+          fecha?: string
+          id?: string
+          iva_10?: number
+          iva_5?: number
+          moneda?: string
+          motivo?: string
+          numero?: string
+          observacion?: string | null
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notas_credito_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notas_credito_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notas_credito_factura_id_fkey"
+            columns: ["factura_id"]
+            isOneToOne: false
+            referencedRelation: "facturas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ordenes_servicio: {
         Row: {
           created_at: string
@@ -550,6 +673,7 @@ export type Database = {
           metodo: string | null
           moneda: string
           monto: number
+          nota_credito_id: string | null
           observacion: string | null
           proveedor_id: string | null
           recibo_id: string | null
@@ -568,6 +692,7 @@ export type Database = {
           metodo?: string | null
           moneda?: string
           monto?: number
+          nota_credito_id?: string | null
           observacion?: string | null
           proveedor_id?: string | null
           recibo_id?: string | null
@@ -586,6 +711,7 @@ export type Database = {
           metodo?: string | null
           moneda?: string
           monto?: number
+          nota_credito_id?: string | null
           observacion?: string | null
           proveedor_id?: string | null
           recibo_id?: string | null
@@ -613,6 +739,13 @@ export type Database = {
             columns: ["factura_id"]
             isOneToOne: false
             referencedRelation: "facturas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagos_nota_credito_id_fkey"
+            columns: ["nota_credito_id"]
+            isOneToOne: false
+            referencedRelation: "notas_credito"
             referencedColumns: ["id"]
           },
           {

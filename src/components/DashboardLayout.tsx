@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Building2, Users, FileText, Package, UserCheck, LayoutDashboard,
   LogOut, Settings, ChevronLeft, ChevronRight, Receipt, BarChart3, Truck,
-  CreditCard, FolderKanban, Wrench, CalendarDays, ArrowLeftRight, FileBarChart, ReceiptText,
+  CreditCard, FolderKanban, Wrench, CalendarDays, ArrowLeftRight, FileBarChart, ReceiptText, FileMinus,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -63,6 +63,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             { label: 'Facturas', href: '/facturas', icon: Receipt },
             { label: 'Cobros/Pagos', href: '/pagos', icon: CreditCard },
             { label: 'Recibos', href: '/recibos', icon: ReceiptText },
+            { label: 'Notas de crédito', href: '/notas-credito', icon: FileMinus },
             { label: 'Proyectos', href: '/proyectos', icon: FolderKanban },
             { label: 'Servicios', href: '/servicios', icon: Wrench },
             { label: 'Calendario', href: '/calendario', icon: CalendarDays },
