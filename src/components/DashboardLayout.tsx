@@ -63,6 +63,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             { label: 'Facturas', href: '/facturas', icon: Receipt },
             { label: 'Cobros/Pagos', href: '/pagos', icon: CreditCard },
             { label: 'Recibos', href: '/recibos', icon: ReceiptText },
+            { label: 'Notas de crédito', href: '/notas-credito', icon: FileMinus },
             { label: 'Proyectos', href: '/proyectos', icon: FolderKanban },
             { label: 'Servicios', href: '/servicios', icon: Wrench },
             { label: 'Calendario', href: '/calendario', icon: CalendarDays },
