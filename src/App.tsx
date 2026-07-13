@@ -16,6 +16,7 @@ import FacturasPage from "@/pages/FacturasPage";
 import SeriesPage from "@/pages/SeriesPage";
 import ProveedoresPage from "@/pages/ProveedoresPage";
 import PagosPage from "@/pages/PagosPage";
+import RecibosPage from "@/pages/RecibosPage";
 import ReportesPage from "@/pages/ReportesPage";
 import UsuariosPage from "@/pages/UsuariosPage";
 import MetricasPage from "@/pages/MetricasPage";
