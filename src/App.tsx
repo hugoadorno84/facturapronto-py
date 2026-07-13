@@ -16,6 +16,7 @@ import FacturasPage from "@/pages/FacturasPage";
 import SeriesPage from "@/pages/SeriesPage";
 import ProveedoresPage from "@/pages/ProveedoresPage";
 import PagosPage from "@/pages/PagosPage";
+import RecibosPage from "@/pages/RecibosPage";
 import ReportesPage from "@/pages/ReportesPage";
 import UsuariosPage from "@/pages/UsuariosPage";
 import MetricasPage from "@/pages/MetricasPage";
@@ -57,6 +58,7 @@ const App = () => (
             <Route path="/series" element={<DashboardRoute allowedRoles={['empresa']}><SeriesPage /></DashboardRoute>} />
             <Route path="/proveedores" element={<DashboardRoute allowedRoles={['empresa']}><ProveedoresPage /></DashboardRoute>} />
             <Route path="/pagos" element={<DashboardRoute allowedRoles={['empresa']}><PagosPage /></DashboardRoute>} />
+            <Route path="/recibos" element={<DashboardRoute allowedRoles={['empresa']}><RecibosPage /></DashboardRoute>} />
             <Route path="/presupuestos" element={<DashboardRoute allowedRoles={['empresa']}><PresupuestosPage /></DashboardRoute>} />
             <Route path="/proyectos" element={<DashboardRoute allowedRoles={['empresa']}><ProyectosPage /></DashboardRoute>} />
             <Route path="/servicios" element={<DashboardRoute allowedRoles={['empresa']}><ServiciosPage /></DashboardRoute>} />

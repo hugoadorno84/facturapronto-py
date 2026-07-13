@@ -552,6 +552,7 @@ export type Database = {
           monto: number
           observacion: string | null
           proveedor_id: string | null
+          recibo_id: string | null
           referencia: string | null
           tipo: Database["public"]["Enums"]["pago_tipo"]
           updated_at: string
@@ -569,6 +570,7 @@ export type Database = {
           monto?: number
           observacion?: string | null
           proveedor_id?: string | null
+          recibo_id?: string | null
           referencia?: string | null
           tipo: Database["public"]["Enums"]["pago_tipo"]
           updated_at?: string
@@ -586,6 +588,7 @@ export type Database = {
           monto?: number
           observacion?: string | null
           proveedor_id?: string | null
+          recibo_id?: string | null
           referencia?: string | null
           tipo?: Database["public"]["Enums"]["pago_tipo"]
           updated_at?: string
@@ -617,6 +620,13 @@ export type Database = {
             columns: ["proveedor_id"]
             isOneToOne: false
             referencedRelation: "proveedores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pagos_recibo_id_fkey"
+            columns: ["recibo_id"]
+            isOneToOne: false
+            referencedRelation: "recibos"
             referencedColumns: ["id"]
           },
         ]
@@ -923,6 +933,111 @@ export type Database = {
           },
         ]
       }
+      recibo_items: {
+        Row: {
+          created_at: string
+          factura_id: string | null
+          id: string
+          monto: number
+          recibo_id: string
+        }
+        Insert: {
+          created_at?: string
+          factura_id?: string | null
+          id?: string
+          monto?: number
+          recibo_id: string
+        }
+        Update: {
+          created_at?: string
+          factura_id?: string | null
+          id?: string
+          monto?: number
+          recibo_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recibo_items_factura_id_fkey"
+            columns: ["factura_id"]
+            isOneToOne: false
+            referencedRelation: "facturas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recibo_items_recibo_id_fkey"
+            columns: ["recibo_id"]
+            isOneToOne: false
+            referencedRelation: "recibos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recibos: {
+        Row: {
+          cliente_id: string
+          created_at: string
+          created_by: string | null
+          empresa_id: string
+          estado: Database["public"]["Enums"]["recibo_status"]
+          fecha: string
+          id: string
+          metodo: string | null
+          moneda: string
+          numero: string
+          observacion: string | null
+          referencia: string | null
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          cliente_id: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id: string
+          estado?: Database["public"]["Enums"]["recibo_status"]
+          fecha?: string
+          id?: string
+          metodo?: string | null
+          moneda?: string
+          numero: string
+          observacion?: string | null
+          referencia?: string | null
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          cliente_id?: string
+          created_at?: string
+          created_by?: string | null
+          empresa_id?: string
+          estado?: Database["public"]["Enums"]["recibo_status"]
+          fecha?: string
+          id?: string
+          metodo?: string | null
+          moneda?: string
+          numero?: string
+          observacion?: string | null
+          referencia?: string | null
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recibos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recibos_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           consultora_id: string | null
@@ -1011,6 +1126,7 @@ export type Database = {
         | "rechazado"
         | "expirado"
       proyecto_status: "abierto" | "en_pausa" | "cerrado"
+      recibo_status: "emitido" | "anulado"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1167,6 +1283,7 @@ export const Constants = {
         "expirado",
       ],
       proyecto_status: ["abierto", "en_pausa", "cerrado"],
+      recibo_status: ["emitido", "anulado"],
     },
   },
 } as const
