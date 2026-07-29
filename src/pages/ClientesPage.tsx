@@ -23,6 +23,7 @@ const emptyForm = {
   tipo_documento: 'RUC',
   plazo_pago_dias: 30,
   activo: true,
+  factura_electronica: false,
 };
 
 const ClientesPage = () => {
@@ -45,6 +46,7 @@ const ClientesPage = () => {
         tipo_documento: editing.tipo_documento ?? 'RUC',
         plazo_pago_dias: editing.plazo_pago_dias ?? 30,
         activo: editing.activo ?? true,
+        factura_electronica: editing.factura_electronica ?? false,
       });
     } else {
       setForm(emptyForm);
@@ -148,6 +150,13 @@ const ClientesPage = () => {
                   <Label>Activo</Label>
                 </div>
               </div>
+              <div className="flex items-center justify-between rounded-lg border border-border p-3">
+                <div>
+                  <Label>Cliente con Factura Electrónica</Label>
+                  <p className="text-xs text-muted-foreground mt-1">Marque si el cliente recibe documentos electrónicos (SIFEN)</p>
+                </div>
+                <Switch checked={form.factura_electronica} onCheckedChange={(v) => setForm({ ...form, factura_electronica: v })} />
+              </div>
               <Button type="submit" className="w-full" disabled={saveMutation.isPending}>
                 {saveMutation.isPending ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear Cliente'}
               </Button>
@@ -172,16 +181,17 @@ const ClientesPage = () => {
                 <TableHead>Email</TableHead>
                 <TableHead>Teléfono</TableHead>
                 <TableHead className="text-center">Plazo</TableHead>
+                <TableHead className="text-center">Fact. electrónica</TableHead>
                 <TableHead className="text-center">Estado</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
+                <TableRow><TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Cargando...</TableCell></TableRow>
               ) : filtered?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
+                  <TableCell colSpan={9} className="text-center py-8">
                     <UserCheck className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground">No hay clientes registrados</p>
                   </TableCell>
@@ -195,6 +205,11 @@ const ClientesPage = () => {
                     <TableCell>{c.email || '—'}</TableCell>
                     <TableCell>{c.telefono || '—'}</TableCell>
                     <TableCell className="text-center">{c.plazo_pago_dias ?? 30} d</TableCell>
+                    <TableCell className="text-center">
+                      <Badge variant={c.factura_electronica ? 'default' : 'outline'}>
+                        {c.factura_electronica ? 'Sí' : 'No'}
+                      </Badge>
+                    </TableCell>
                     <TableCell className="text-center">
                       <Badge variant={c.activo ? 'default' : 'secondary'}>
                         {c.activo ? 'Activo' : 'Inactivo'}

@@ -13,10 +13,13 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, FileText, MoreHorizontal, Pencil, CheckCircle, XCircle, Eye, Trash2 } from 'lucide-react';
+import { Plus, Search, FileText, MoreHorizontal, Pencil, CheckCircle, XCircle, Eye, Trash2, Printer, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { InvoiceFormDialog } from '@/components/invoices/InvoiceFormDialog';
 import { InvoiceDetailDialog } from '@/components/invoices/InvoiceDetailDialog';
+import {
+  buildFacturaHtml, printFacturaHtml, buildMailtoLink, resolveVars, defaultPlantilla, PlantillaFactura,
+} from '@/lib/facturaTemplate';
 
 const statusLabels: Record<string, string> = {
   borrador: 'Borrador',
@@ -49,12 +52,14 @@ const FacturasPage = () => {
   const [viewing, setViewing] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
+  const empresaId = userRole?.empresa_id;
+
   const { data: facturas, isLoading } = useQuery({
     queryKey: ['facturas', statusFilter],
     queryFn: async () => {
       let q = supabase
         .from('facturas')
-        .select('*, clientes(nombre, ruc, sucursal)')
+        .select('*, clientes(nombre, ruc, sucursal, direccion, telefono, email, factura_electronica)')
         .order('fecha', { ascending: false });
       if (statusFilter !== 'all') q = q.eq('estado', statusFilter as any);
       const { data, error } = await q;
@@ -62,6 +67,59 @@ const FacturasPage = () => {
       return data || [];
     },
   });
+
+  const { data: plantilla } = useQuery({
+    queryKey: ['factura_plantilla', empresaId],
+    enabled: !!empresaId,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('factura_plantillas').select('*').eq('empresa_id', empresaId!).maybeSingle();
+      return data;
+    },
+  });
+
+  const { data: empresa } = useQuery({
+    queryKey: ['empresa', empresaId],
+    enabled: !!empresaId,
+    queryFn: async () => {
+      const { data } = await supabase.from('empresas').select('*').eq('id', empresaId!).maybeSingle();
+      return data;
+    },
+  });
+
+  const buildHtml = async (f: any) => {
+    const { data: items } = await supabase.from('factura_items').select('*').eq('factura_id', f.id);
+    return buildFacturaHtml({
+      factura: f,
+      items: items || [],
+      cliente: f.clientes,
+      empresa,
+      plantilla: { ...defaultPlantilla, ...(plantilla || {}) } as PlantillaFactura,
+    });
+  };
+
+  const imprimir = async (f: any) => {
+    const html = await buildHtml(f);
+    if (!printFacturaHtml(html)) toast.error('Permita las ventanas emergentes para imprimir');
+  };
+
+  const enviarEmail = async (f: any) => {
+    const email = f.clientes?.email;
+    if (!email) {
+      toast.error('El cliente no tiene email registrado');
+      return;
+    }
+    const p = { ...defaultPlantilla, ...(plantilla || {}) } as PlantillaFactura;
+    const html = await buildHtml(f);
+    printFacturaHtml(html);
+    window.location.href = buildMailtoLink(
+      email,
+      resolveVars(p.email_asunto, f, f.clientes),
+      resolveVars(p.email_cuerpo, f, f.clientes),
+    );
+    toast.success('Se abrió su cliente de correo y la vista de impresión para adjuntar el PDF');
+  };
+
 
   const filtered = facturas?.filter((f: any) => {
     if (!search) return true;
@@ -189,6 +247,12 @@ const FacturasPage = () => {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => { setViewing(f); setDetailOpen(true); }}>
                             <Eye className="mr-2 h-4 w-4" /> Ver detalle
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => imprimir(f)}>
+                            <Printer className="mr-2 h-4 w-4" /> Imprimir
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => enviarEmail(f)}>
+                            <Mail className="mr-2 h-4 w-4" /> Enviar por email
                           </DropdownMenuItem>
                           {f.estado === 'borrador' && (
                             <>

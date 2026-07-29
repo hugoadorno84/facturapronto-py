@@ -28,6 +28,7 @@ import ServiciosPage from "@/pages/ServiciosPage";
 import CalendarioPage from "@/pages/CalendarioPage";
 import TipoCambioPage from "@/pages/TipoCambioPage";
 import NotasCreditoPage from "@/pages/NotasCreditoPage";
+import PlantillaFacturaPage from "@/pages/PlantillaFacturaPage";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/calendario" element={<DashboardRoute allowedRoles={['empresa']}><CalendarioPage /></DashboardRoute>} />
             <Route path="/tipo-cambio" element={<DashboardRoute allowedRoles={['empresa']}><TipoCambioPage /></DashboardRoute>} />
             <Route path="/reportes" element={<DashboardRoute allowedRoles={['empresa']}><ReportesPage /></DashboardRoute>} />
+            <Route path="/plantilla-factura" element={<DashboardRoute allowedRoles={['empresa']}><PlantillaFacturaPage /></DashboardRoute>} />
             <Route path="/facturacion" element={<DashboardRoute allowedRoles={['consultora']}><FacturacionConsultoraPage /></DashboardRoute>} />
             <Route path="/configuracion" element={<DashboardRoute><ConfiguracionPage /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
