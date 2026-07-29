@@ -23,6 +23,7 @@ const emptyForm = {
   tipo_documento: 'RUC',
   plazo_pago_dias: 30,
   activo: true,
+  factura_electronica: false,
 };
 
 const ClientesPage = () => {
@@ -45,6 +46,7 @@ const ClientesPage = () => {
         tipo_documento: editing.tipo_documento ?? 'RUC',
         plazo_pago_dias: editing.plazo_pago_dias ?? 30,
         activo: editing.activo ?? true,
+        factura_electronica: editing.factura_electronica ?? false,
       });
     } else {
       setForm(emptyForm);
