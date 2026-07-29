@@ -13,10 +13,13 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, FileText, MoreHorizontal, Pencil, CheckCircle, XCircle, Eye, Trash2 } from 'lucide-react';
+import { Plus, Search, FileText, MoreHorizontal, Pencil, CheckCircle, XCircle, Eye, Trash2, Printer, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { InvoiceFormDialog } from '@/components/invoices/InvoiceFormDialog';
 import { InvoiceDetailDialog } from '@/components/invoices/InvoiceDetailDialog';
+import {
+  buildFacturaHtml, printFacturaHtml, buildMailtoLink, resolveVars, defaultPlantilla, PlantillaFactura,
+} from '@/lib/facturaTemplate';
 
 const statusLabels: Record<string, string> = {
   borrador: 'Borrador',
