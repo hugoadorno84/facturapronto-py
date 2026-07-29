@@ -19,6 +19,25 @@ const PlantillaFacturaPage = () => {
   const qc = useQueryClient();
   const empresaId = userRole?.empresa_id;
   const [form, setForm] = useState<PlantillaFactura>(defaultPlantilla);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const onPickLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('El archivo debe ser una imagen');
+      return;
+    }
+    if (file.size > 500 * 1024) {
+      toast.error('La imagen no debe superar 500 KB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setForm((f) => ({ ...f, logo_url: String(reader.result) }));
+    reader.onerror = () => toast.error('No se pudo leer la imagen');
+    reader.readAsDataURL(file);
+  };
 
   const { data: plantilla } = useQuery({
     queryKey: ['factura_plantilla', empresaId],
