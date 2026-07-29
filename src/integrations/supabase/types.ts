@@ -21,6 +21,7 @@ export type Database = {
           direccion: string | null
           email: string | null
           empresa_id: string
+          factura_electronica: boolean
           id: string
           nombre: string
           plazo_pago_dias: number
@@ -36,6 +37,7 @@ export type Database = {
           direccion?: string | null
           email?: string | null
           empresa_id: string
+          factura_electronica?: boolean
           id?: string
           nombre: string
           plazo_pago_dias?: number
@@ -51,6 +53,7 @@ export type Database = {
           direccion?: string | null
           email?: string | null
           empresa_id?: string
+          factura_electronica?: boolean
           id?: string
           nombre?: string
           plazo_pago_dias?: number
@@ -308,6 +311,65 @@ export type Database = {
             columns: ["producto_id"]
             isOneToOne: false
             referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      factura_plantillas: {
+        Row: {
+          color_primario: string
+          created_at: string
+          email_asunto: string
+          email_cuerpo: string
+          empresa_id: string
+          id: string
+          logo_url: string | null
+          mostrar_datos_empresa: boolean
+          mostrar_observacion: boolean
+          mostrar_timbrado: boolean
+          notas_legales: string | null
+          pie_pagina: string | null
+          titulo_documento: string
+          updated_at: string
+        }
+        Insert: {
+          color_primario?: string
+          created_at?: string
+          email_asunto?: string
+          email_cuerpo?: string
+          empresa_id: string
+          id?: string
+          logo_url?: string | null
+          mostrar_datos_empresa?: boolean
+          mostrar_observacion?: boolean
+          mostrar_timbrado?: boolean
+          notas_legales?: string | null
+          pie_pagina?: string | null
+          titulo_documento?: string
+          updated_at?: string
+        }
+        Update: {
+          color_primario?: string
+          created_at?: string
+          email_asunto?: string
+          email_cuerpo?: string
+          empresa_id?: string
+          id?: string
+          logo_url?: string | null
+          mostrar_datos_empresa?: boolean
+          mostrar_observacion?: boolean
+          mostrar_timbrado?: boolean
+          notas_legales?: string | null
+          pie_pagina?: string | null
+          titulo_documento?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "factura_plantillas_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
