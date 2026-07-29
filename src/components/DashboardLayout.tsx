@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Building2, Users, FileText, Package, UserCheck, LayoutDashboard,
   LogOut, Settings, ChevronLeft, ChevronRight, Receipt, BarChart3, Truck,
-  CreditCard, FolderKanban, Wrench, CalendarDays, ArrowLeftRight, FileBarChart, ReceiptText, FileMinus,
+  CreditCard, FolderKanban, Wrench, CalendarDays, ArrowLeftRight, FileBarChart, ReceiptText, FileMinus, Palette,
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -74,6 +74,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           label: 'Sistema',
           items: [
             { label: 'Tipo de cambio', href: '/tipo-cambio', icon: ArrowLeftRight },
+            { label: 'Formato de factura', href: '/plantilla-factura', icon: Palette },
             { label: 'Reportes', href: '/reportes', icon: FileBarChart },
             { label: 'Configuración', href: '/configuracion', icon: Settings },
           ],
