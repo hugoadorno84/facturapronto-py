@@ -248,6 +248,12 @@ const FacturasPage = () => {
                           <DropdownMenuItem onClick={() => { setViewing(f); setDetailOpen(true); }}>
                             <Eye className="mr-2 h-4 w-4" /> Ver detalle
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => imprimir(f)}>
+                            <Printer className="mr-2 h-4 w-4" /> Imprimir
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => enviarEmail(f)}>
+                            <Mail className="mr-2 h-4 w-4" /> Enviar por email
+                          </DropdownMenuItem>
                           {f.estado === 'borrador' && (
                             <>
                               <DropdownMenuItem onClick={() => openEdit(f)}>
