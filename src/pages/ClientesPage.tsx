@@ -150,6 +150,13 @@ const ClientesPage = () => {
                   <Label>Activo</Label>
                 </div>
               </div>
+              <div className="flex items-center justify-between rounded-lg border border-border p-3">
+                <div>
+                  <Label>Cliente con Factura Electrónica</Label>
+                  <p className="text-xs text-muted-foreground mt-1">Marque si el cliente recibe documentos electrónicos (SIFEN)</p>
+                </div>
+                <Switch checked={form.factura_electronica} onCheckedChange={(v) => setForm({ ...form, factura_electronica: v })} />
+              </div>
               <Button type="submit" className="w-full" disabled={saveMutation.isPending}>
                 {saveMutation.isPending ? 'Guardando...' : editing ? 'Guardar cambios' : 'Crear Cliente'}
               </Button>
