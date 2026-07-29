@@ -206,6 +206,11 @@ const ClientesPage = () => {
                     <TableCell>{c.telefono || '—'}</TableCell>
                     <TableCell className="text-center">{c.plazo_pago_dias ?? 30} d</TableCell>
                     <TableCell className="text-center">
+                      <Badge variant={c.factura_electronica ? 'default' : 'outline'}>
+                        {c.factura_electronica ? 'Sí' : 'No'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
                       <Badge variant={c.activo ? 'default' : 'secondary'}>
                         {c.activo ? 'Activo' : 'Inactivo'}
                       </Badge>
