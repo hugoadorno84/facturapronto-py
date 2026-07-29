@@ -121,9 +121,35 @@ const PlantillaFacturaPage = () => {
                 onChange={(e) => setForm({ ...form, titulo_documento: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label>URL del logo</Label>
-              <Input value={form.logo_url || ''} placeholder="https://..."
+              <Label>Logo</Label>
+              <Input value={form.logo_url?.startsWith('data:') ? '' : (form.logo_url || '')}
+                placeholder="https://... (o subir desde el dispositivo)"
                 onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  className="hidden"
+                  onChange={onPickLogo}
+                />
+                <Button type="button" variant="secondary" size="sm" onClick={() => fileRef.current?.click()}>
+                  <Upload className="h-4 w-4 mr-2" /> Subir imagen
+                </Button>
+                {form.logo_url && (
+                  <Button type="button" variant="ghost" size="sm"
+                    onClick={() => setForm({ ...form, logo_url: '' })}>
+                    <X className="h-4 w-4 mr-1" /> Quitar
+                  </Button>
+                )}
+              </div>
+              {form.logo_url && (
+                <img src={form.logo_url} alt="Vista previa del logo"
+                  className="max-h-16 rounded border border-border bg-background/40 p-1" />
+              )}
+              <p className="text-xs text-muted-foreground">
+                PNG, JPG, WEBP o SVG. Máximo 500 KB.
+              </p>
             </div>
             <div className="space-y-2">
               <Label>Color principal</Label>
