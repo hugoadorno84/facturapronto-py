@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Palette, Printer } from 'lucide-react';
+import { Palette, Printer, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   buildFacturaHtml, defaultPlantilla, printFacturaHtml, PlantillaFactura,
@@ -19,6 +19,25 @@ const PlantillaFacturaPage = () => {
   const qc = useQueryClient();
   const empresaId = userRole?.empresa_id;
   const [form, setForm] = useState<PlantillaFactura>(defaultPlantilla);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const onPickLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('El archivo debe ser una imagen');
+      return;
+    }
+    if (file.size > 500 * 1024) {
+      toast.error('La imagen no debe superar 500 KB');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setForm((f) => ({ ...f, logo_url: String(reader.result) }));
+    reader.onerror = () => toast.error('No se pudo leer la imagen');
+    reader.readAsDataURL(file);
+  };
 
   const { data: plantilla } = useQuery({
     queryKey: ['factura_plantilla', empresaId],
@@ -121,9 +140,35 @@ const PlantillaFacturaPage = () => {
                 onChange={(e) => setForm({ ...form, titulo_documento: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label>URL del logo</Label>
-              <Input value={form.logo_url || ''} placeholder="https://..."
+              <Label>Logo</Label>
+              <Input value={form.logo_url?.startsWith('data:') ? '' : (form.logo_url || '')}
+                placeholder="https://... (o subir desde el dispositivo)"
                 onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
+              <div className="flex items-center gap-2">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  className="hidden"
+                  onChange={onPickLogo}
+                />
+                <Button type="button" variant="secondary" size="sm" onClick={() => fileRef.current?.click()}>
+                  <Upload className="h-4 w-4 mr-2" /> Subir imagen
+                </Button>
+                {form.logo_url && (
+                  <Button type="button" variant="ghost" size="sm"
+                    onClick={() => setForm({ ...form, logo_url: '' })}>
+                    <X className="h-4 w-4 mr-1" /> Quitar
+                  </Button>
+                )}
+              </div>
+              {form.logo_url && (
+                <img src={form.logo_url} alt="Vista previa del logo"
+                  className="max-h-16 rounded border border-border bg-background/40 p-1" />
+              )}
+              <p className="text-xs text-muted-foreground">
+                PNG, JPG, WEBP o SVG. Máximo 500 KB.
+              </p>
             </div>
             <div className="space-y-2">
               <Label>Color principal</Label>
